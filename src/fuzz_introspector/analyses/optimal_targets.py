@@ -72,6 +72,7 @@ class Analysis(analysis.AnalysisInterface):
         """
 
         logger.info(f" - Running analysis {Analysis.get_name()}")
+        logger.info("@@@@@%s"%profiles[0].target_lang)
 
         html_string = ""
         html_string += html_helpers.html_add_header_with_link(
@@ -81,7 +82,6 @@ class Analysis(analysis.AnalysisInterface):
         new_profile, optimal_target_functions = self.iteratively_get_optimal_targets(
             proj_profile
         )
-        logger.info("@@@@@%s"%profiles[0].target_lang)
         html_string += self.get_optimal_target_section(
             optimal_target_functions,
             toc_list,
@@ -259,6 +259,7 @@ class Analysis(analysis.AnalysisInterface):
                 ("Unreached complexity", "")
             ]
         )
+        logger.info("@@@@@@@IN%s@@@"%target_lang)
         for fd in optimal_target_functions:
             func_cov_url = utils.resolve_coverage_link(
                 coverage_url,
