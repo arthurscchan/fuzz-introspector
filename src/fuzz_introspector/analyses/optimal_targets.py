@@ -81,6 +81,7 @@ class Analysis(analysis.AnalysisInterface):
         new_profile, optimal_target_functions = self.iteratively_get_optimal_targets(
             proj_profile
         )
+        logger.info("@@@@@%s"%profiles[0].target_lang)
         html_string += self.get_optimal_target_section(
             optimal_target_functions,
             toc_list,

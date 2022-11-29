@@ -38,9 +38,10 @@ then
 
   cd $OUT
   rm -rf fuzz-introspector
-  git clone https://github.com/ossf/fuzz-introspector
+  git clone https://github.com/arthurscchan/fuzz-introspector
 
   cd fuzz-introspector/frontends/java/
+  git checkout testing
   sed -i 's/mvn/$MVN/g' run.sh
   ./run.sh -j $jarfile -c $class -m fuzzerTestOneInput
   cd $OUT
