@@ -165,21 +165,18 @@ class CustomSenceTransformer extends SceneTransformer {
 				  continue;
 			  }
 			  
-			  if (m.getName().equals(this.entryMethodStr) && c.getName().equals(this.entryClassStr)) {
-				  this.entryMethod = m;
-			  }
-			  
-			  // Discover method related information
+			 // Discover method related information
 			  FunctionElement element = new FunctionElement();
 			  Map<String, Integer> functionLineMap = new HashMap<String, Integer>();
 			  
-			  // Unable to retrieve from Soot
-			  // element.setLinkageType("???");
-			  // element.setConstantsTouched([]);
-			  // element.setArgNames();
+			  if (m.getName().equals(this.entryMethodStr) && c.getName().equals(this.entryClassStr)) {
+				  this.entryMethod = m;
+				  element.setFunctionName(m.getSubSignature().split(" ")[1]);
+			  } else {
+				  element.setFunctionName("[" + c.getFilePath() + "]." + m.getSubSignature().split(" ")[1]);
+			  }
 			  
-			  element.setFunctionName(m.getSubSignature().split(" ")[1]);
-			  element.setFunctionSourceFile(c.getFilePath());
+			  element.setFunctionSourceFile(c.getFilePath());			  
 			  element.setFunctionLinenumber(m.getJavaSourceStartLineNumber());
 			  element.setReturnType(m.getReturnType().toString());
 			  element.setFunctionDepth(calculateDepth(callGraph, m));
