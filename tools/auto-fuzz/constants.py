@@ -18,6 +18,13 @@ MAX_THREADS = 4
 
 BATCH_SIZE_BEFORE_DOCKER_CLEAN = 40
 
+MAVEN_URL = "https://downloads.apache.org/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.zip"
+GRADLE_URL = "https://services.gradle.org/distributions/gradle-7.4.2-bin.zip"
+
+MAVEN_PATH = "apache-maven-3.6.3/bin"
+GRADLE_HOME = "gradle-7.4.2"
+GRADLE_PATH = f"{GRADLE_HOME}/bin"
+
 git_repos = {
     'python': [
         # 'https://github.com/davidhalter/parso',
@@ -25,7 +32,21 @@ git_repos = {
         # 'https://github.com/executablebooks/markdown-it-py'
     ],
     'jvm': [
-        # 'https://github.com/eclipse-ee4j/angus-mail',
-        'https://github.com/jboss-javassist/javassist'
+        'https://github.com/eclipse-ee4j/angus-mail',
+        'https://github.com/junrar/junrar',
+        'https://github.com/dom4j/dom4j',
+        # 'https://github.com/spring-projects/spring-data-mongodb',
+        # 'https://github.com/apache/commons-jxpath',
+        # 'https://github.com/google/gson',
+        # 'https://github.com/qos-ch/logback',
+        # 'https://github.com/x-stream/xstream',
+        # 'https://github.com/HtmlUnit/htmlunit',
+        # 'https://github.com/spring-cloud/spring-cloud-config',
+        # 'https://github.com/google/brotli',
+        # 'https://github.com/qos-ch/reload4j',
+        # 'https://github.com/apache/commons-beanutils',
+        # 'https://github.com/qos-ch/slf4j',
+        # 'https://github.com/openjdk/jdk/tree/master/src/java.xml/share/classes',
+        # 'https://github.com/jboss-javassist/javassist',
     ]
 }
