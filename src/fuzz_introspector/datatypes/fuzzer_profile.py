@@ -400,8 +400,8 @@ class FuzzerProfile:
         # Find JVM entrypoint
         elif self._target_lang == "jvm":
             if self.entrypoint_function in self.all_class_functions:
-                self.functions_reached_by_fuzzer = (self.all_class_functions[
-                    self.entrypoint_function].functions_reached)
+                self.functions_reached_by_fuzzer = (
+                    self.all_class_functions[self.entrypoint_function].functions_reached)
                 self.functions_reached_by_fuzzer.append(
                     self.entrypoint_function)
                 return
