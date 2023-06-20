@@ -616,6 +616,7 @@ def _handle_object_creation(classname,
         isArray = False
 
     if init_dict and classname in init_dict.keys():
+        print(classname)
         if class_field and init_dict[classname]:
             # Use defined class object
             func_elem = init_dict[classname][0]
@@ -623,14 +624,14 @@ def _handle_object_creation(classname,
                 func_elem, possible_target)
             if class_field_choice:
                 return [class_field_choice]
-
+        print("FFF")
         result_list = []
         for func_elem in init_dict[classname]:
             # Use constructor or factory method
             try:
                 arg_list = []
                 class_list = []
-
+                print("GGG")
                 concrete = False
                 if func_elem['JavaMethodInfo']['classConcrete']:
                     class_list.append(func_elem)
@@ -641,10 +642,11 @@ def _handle_object_creation(classname,
                                                   handled))
                 if len(class_list) == 0:
                     return []
-
+                print("HHH")
                 for elem in class_list:
                     elem_classname = elem['functionSourceFile'].replace(
                         '$', '.')
+                    print(handled)
                     if elem in handled:
                         continue
                     handled.append(elem)
@@ -672,9 +674,11 @@ def _handle_object_creation(classname,
                                 "$", ".") + "[]{%s}" % statement
                         result_list.append(statement)
                         if len(result_list) > max_target:
+                            print("JJJ")
                             return result_list
                         if not need_param_combination:
                             break
+                    print("III")
             except RecursionError:
                 # Fail to create constructor code with parameters
                 pass
@@ -934,15 +938,23 @@ def _generate_heuristic_2(method_tuple, possible_targets, max_target):
 
     init_dict, method_list, _, _ = method_tuple
 
-    method_map = _group_method_by_class(method_list)
-
-    # Process target method class by class
-    for key in method_map.keys():
-        method_list = method_map[key]
+    for func_elem in method_list:
+        if len(possible_targets) > max_target:
+            return
 
         # Initialize base possible_target object
-        possible_target = FuzzTarget(func_elem=method_list[0])
+        possible_target = FuzzTarget(func_elem=func_elem)
+        func_name = possible_target.function_target
         func_class = possible_target.function_class
+        print(func_name+"\n")
+        # Get all possible argument lists with different possible object creation combination
+        for argType in func_elem['argTypes']:
+            arg_list = _handle_argument(argType.replace('$', '.'), init_dict,
+                                        possible_target, max_target)
+            if arg_list:
+                possible_target.variables_to_add.append(arg_list[0])
+        if len(possible_target.variables_to_add) != len(func_elem['argTypes']):
+            continue
 
         # Get all object creation statement for each possible concrete classes of the object
         object_creation_list = _handle_object_creation(func_class, init_dict,
@@ -953,35 +965,14 @@ def _generate_heuristic_2(method_tuple, possible_targets, max_target):
             # Create possible target for all possible object creation statement
             # Clone the base target object
             cloned_possible_target = FuzzTarget(orig=possible_target)
-            exception_set = set(possible_target.exceptions_to_handle)
+            exception_set = set(cloned_possible_target.exceptions_to_handle)
 
-            # Create the actual source for base object creation
+            # Create the actual source
             fuzzer_source_code = "  // Heuristic name: %s\n" % (HEURISTIC_NAME)
+            fuzzer_source_code += " // Target method: %s\n" % (func_elem['functionName'])
             fuzzer_source_code += "  %s obj = %s;\n" % (func_class,
                                                         object_creation_item)
-
-            for func_elem in method_list:
-                if len(possible_targets) > max_target:
-                    return
-                # Clone the method FuzzTarget object for this target method
-                method_possible_target = FuzzTarget(func_elem=func_elem)
-                func_name = method_possible_target.function_target
-
-                # Get all possible argument lists with different possible object creation combination
-                for argType in func_elem['argTypes']:
-                    arg_list = _handle_argument(argType.replace('$', '.'),
-                                                init_dict, possible_target,
-                                                max_target)
-                    if arg_list:
-                        possible_target.variables_to_add.append(arg_list[0])
-                if len(possible_target.variables_to_add) != len(
-                        func_elem['argTypes']):
-                    continue
-
-                fuzzer_source_code += "  obj.%s($VARIABLE$);\n" % (func_name)
-                exception_set.update(
-                    method_possible_target.exceptions_to_handle)
-
+            fuzzer_source_code += "  obj.%s($VARIABLE$);\n" % (func_name)
             if len(exception_set) > 0:
                 fuzzer_source_code = "  try {\n" + fuzzer_source_code
                 fuzzer_source_code += "  }\n"
@@ -1054,6 +1045,7 @@ def _generate_heuristic_3(method_tuple, possible_targets, max_target):
 
             # Create the actual source
             fuzzer_source_code = "  // Heuristic name: %s\n" % (HEURISTIC_NAME)
+            fuzzer_source_code += " // Target method: %s\n" % (func_elem['functionName'])
             fuzzer_source_code += "  %s obj = %s;\n" % (func_class,
                                                         factory_method)
             fuzzer_source_code += "  obj.%s($VARIABLE$);\n" % (func_name)
@@ -1123,6 +1115,7 @@ def _generate_heuristic_4(method_tuple, possible_targets, max_target):
 
             # Create the actual source
             fuzzer_source_code = "  // Heuristic name: %s\n" % (HEURISTIC_NAME)
+            fuzzer_source_code += " // Target method: %s\n" % (func_elem['functionName'])
             fuzzer_source_code += "  %s obj = %s;\n" % (func_class,
                                                         factory_method)
             fuzzer_source_code += "  obj.%s($VARIABLE$);\n" % (func_name)
@@ -1198,6 +1191,7 @@ def _generate_heuristic_6(method_tuple, possible_targets, max_target):
 
             # Create the actual source
             fuzzer_source_code = "  // Heuristic name: %s\n" % (HEURISTIC_NAME)
+            fuzzer_source_code += " // Target method: %s\n" % (func_elem['functionName'])
             fuzzer_source_code += "  %s obj = %s;\n" % (func_class,
                                                         object_creation)
             for settings in _search_setting_method(instance_method_list,
@@ -1295,6 +1289,7 @@ def _generate_heuristic_7(method_tuple, possible_targets, max_target):
 
             # Create the actual source
             fuzzer_source_code = "  // Heuristic name: %s\n" % (HEURISTIC_NAME)
+            fuzzer_source_code += " // Target method: %s\n" % (func_elem['functionName'])
 
             # Create fix parameters from random data
             arg_counter = 1
@@ -1398,6 +1393,7 @@ def _generate_heuristic_8(method_tuple, possible_targets, max_target):
 
             # Create the actual source
             fuzzer_source_code = "  // Heuristic name: %s\n" % (HEURISTIC_NAME)
+            fuzzer_source_code += " // Target method: %s\n" % (func_elem['functionName'])
             fuzzer_source_code += "  %s obj = %s;\n" % (func_class,
                                                         object_creation)
             fuzzer_source_code += "  obj.%s($VARIABLE$);\n" % (func_name)
@@ -1482,6 +1478,7 @@ def _generate_heuristic_9(method_tuple, possible_targets, max_target):
 
             # Create the actual source
             fuzzer_source_code = "  // Heuristic name: %s\n" % (HEURISTIC_NAME)
+            fuzzer_source_code += " // Target method: %s\n" % (func_elem['functionName'])
             fuzzer_source_code += "  %s obj = %s;\n" % (func_class,
                                                         object_creation)
             fuzzer_source_code += "  obj.%s($VARIABLE$);\n" % (func_name)
@@ -1574,6 +1571,7 @@ def _generate_heuristic_10(method_tuple, possible_targets, max_target):
 
             # Create the actual source
             fuzzer_source_code = "  // Heuristic name: %s\n" % (HEURISTIC_NAME)
+            fuzzer_source_code += " // Target method: %s\n" % (func_elem['functionName'])
             fuzzer_source_code += "  %s obj = %s;\n" % (func_class,
                                                         object_creation)
             fuzzer_source_code += "  obj.%s($VARIABLE$);\n" % (func_name)
