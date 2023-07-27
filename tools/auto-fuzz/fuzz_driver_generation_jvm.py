@@ -283,43 +283,43 @@ def _handle_argument(argType,
                      class_object=False):
     """Generate data creation statement for given argument type"""
     if argType == "int" or argType == "java.lang.Integer":
-        return ["data.consumeInt(0,100)"]
+        return ["data.consumeInt()"]
     elif argType == "int[]":
-        return ["data.consumeInts(5)"]
+        return ["data.consumeInts(data.consumeInt(1, 5))"]
     elif argType == "java.lang.Integer[]":
-        return ["ArrayUtils.toObject(data.consumeInts(5))"]
+        return ["ArrayUtils.toObject(data.consumeInts(data.consumeInt(1, 5)))"]
     elif argType == "boolean" or argType == "java.lang.Boolean":
         return ["data.consumeBoolean()"]
     elif argType == "boolean[]":
-        return ["data.consumeBooleans(5)"]
+        return ["data.consumeBooleans(data.consumeInt(1, 5))"]
     elif argType == "java.lang.Boolean[]":
-        return ["ArrayUtils.toObject(data.consumeBooleans(5))"]
+        return ["ArrayUtils.toObject(data.consumeInt(1, 5))"]
     elif argType == "byte" or argType == "java.lang.Byte":
         return ["data.consumeByte()"]
     elif argType == "byte[]":
-        return ["data.consumeBytes(5)"]
+        return ["data.consumeBytes(data.remainingBytes() / 2)"]
     elif argType == "java.lang.Byte[]":
-        return ["ArrayUtils.toObject(data.consumeBytes(5))"]
+        return ["ArrayUtils.toObject(data.consumeBytes(data.remainingBytes() / 2))"]
     elif argType == "short" or argType == "java.lang.Short":
         return ["data.consumeShort()"]
     elif argType == "short[]":
-        return ["data.consumeShorts(5)"]
+        return ["data.consumeShorts(data.consumeInt(1, 5))"]
     elif argType == "java.lang.Short[]":
-        return ["ArrayUtils.toObject(data.consumeShorts(5))"]
+        return ["ArrayUtils.toObject(data.consumeShorts(data.consumeInt(1, 5)))"]
     elif argType == "long" or argType == "java.lang.Long":
         return ["data.consumeLong()"]
     elif argType == "long[]":
-        return ["data.consumeLongs(5)"]
+        return ["data.consumeLongs(data.consumeInt(1, 5))"]
     elif argType == "java.lang.Long[]":
-        return ["ArrayUtils.toObject(data.consumeLongs(5))"]
+        return ["ArrayUtils.toObject(data.consumeLongs(data.consumeInt(1, 5)))"]
     elif argType == "float" or argType == "java.lang.Float":
         return ["data.consumeFloat()"]
     elif argType == "char" or argType == "java.lang.Character":
         return ["data.consumeCharNoSurrogates()"]
     elif argType == "java.lang.String":
-        return ["data.consumeString(100)"]
+        return ["data.consumeString(data.remainingBytes() / 2)"]
     elif argType == "java.lang.String[]":
-        return ["new java.lang.String[]{data.consumeString(100)}"]
+        return ["new java.lang.String[]{data.consumeString(data.remainingBytes() / 2)}"]
 
     if enum_object and _is_enum_class(init_dict, argType):
         result = _handle_enum_choice(init_dict, argType)
